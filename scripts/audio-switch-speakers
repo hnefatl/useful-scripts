@@ -1,0 +1,20 @@
+#!@bash@/bin/bash
+
+function die() {
+    @libnotify@/bin/notify-send -a Audio -t 1000 -u low "$2"
+    exit $1
+}
+
+speakerindex=$(@pulseaudio@/bin/pactl list short sinks | grep -i "pci-0000_00_1f.3" | awk '{print $1}')
+
+if [[ "$speakerindex" == "" ]] ; then
+    die 1 "No speakers attached"
+fi
+
+@pulseaudio@/bin/pacmd set-default-sink $speakerindex || die 2 "Failed to set speakers as default sink"
+
+for audiosource in $(@pulseaudio@/bin/pactl list short sink-inputs | awk '{print $1}') ; do
+    @pulseaudio@/bin/pactl move-sink-input $audiosource $speakerindex || die 3 "Failed to move sink-input"
+done
+
+die 0 "Switched to speakers"

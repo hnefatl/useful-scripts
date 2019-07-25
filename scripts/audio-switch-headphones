@@ -1,0 +1,20 @@
+#!@bash@/bin/bash
+
+function die() {
+    @libnotify@/bin/notify-send -a Audio -t 1000 -u low "$2"
+    exit $1
+}
+
+headsetindex=$(@pulseaudio@/bin/pactl list short sinks | grep -iE "headset|bluez" | awk '{print $1}')
+
+if [[ "$headsetindex" == "" ]] ; then
+    die 1 "No headphones attached"
+fi
+
+@pulseaudio@/bin/pacmd set-default-sink $headsetindex || die 2 "Failed to set headphones as default sink"
+
+for audiosource in $(@pulseaudio@/bin/pactl list short sink-inputs | awk '{print $1}') ; do
+    @pulseaudio@/bin/pactl move-sink-input $audiosource $headsetindex || die 3 "Failed to move sink-input"
+done
+
+die 0 "Switched to headphones"

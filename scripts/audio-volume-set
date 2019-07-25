@@ -1,0 +1,12 @@
+#!@bash@/bin/bash
+
+if [[ $# != 1 ]] ; then
+    echo "Usage: audio-increase <amount>"
+    echo "Amount can be given as absolute (110%) or relative (+5%, -5%)"
+fi
+
+prefix="Default sink name: "
+sinkname=$(@pulseaudio@/bin/pacmd stat | grep "$prefix")
+sinkname=${sinkname#$prefix}
+
+@pulseaudio@/bin/pactl set-sink-volume "$sinkname" "$1"

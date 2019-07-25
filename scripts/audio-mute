@@ -1,0 +1,7 @@
+#!@bash@/bin/bash
+
+prefix="Default sink name: "
+sinkname=$(@pulseaudio@/bin/pacmd stat | grep "$prefix")
+sinkname=${sinkname#$prefix}
+
+@pulseaudio@/bin/pactl set-sink-mute "$sinkname" toggle
