@@ -1,0 +1,8 @@
+#!@bash@/bin/bash
+
+# Run instead of dmenu by dunstify, to allow us to execute commands from notifications
+# Dunstify passes us strings on the command line like:
+# "#<command> [<Notification-invoking program name>]"
+
+commands="$(cat - | sed "s/#\(.*\)\[.*/\1/")"
+eval "$commands"
